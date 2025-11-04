@@ -1335,12 +1335,11 @@ Double d = new Double(0.9);
             watermark.style.pointerEvents = 'none';
             watermark.style.userSelect = 'none';
             watermark.style.letterSpacing = '2px';
-              
+            
             // 设置水印内容，包含小号字体的"天浩同学"和用户ID
             watermark.innerHTML = '<span style="font-size: 24px;">天浩同学</span> ' + userId;
             
-            
-             // 添加适量水印，避免过度叠加
+            // 添加适量水印，避免过度叠加
             const watermarkPositions = [
                 { top: 20, left: 20, rotation: -45 },
                 { top: 20, left: 60, rotation: -50 },
@@ -1361,6 +1360,10 @@ Double d = new Double(0.9);
                 clone.style.transform = `translate(-50%, -50%) rotate(${pos.rotation}deg)`;
                 document.body.appendChild(clone);
             })
+            
+            // 保存用户ID到本地存储
+            localStorage.setItem('java_exam_user', userId);
+        }
         
         // 防盗版功能：禁用右键菜单
         function disableRightClick() {

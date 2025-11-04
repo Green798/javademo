@@ -1838,36 +1838,15 @@ Double d = new Double(0.9);
         function initCodeHighlighting() {
             const codeBlocks = document.querySelectorAll('.code-block');
             codeBlocks.forEach(block => {
+                // 获取原始代码内容
                 let code = block.textContent;
                 
-                // 保留原始空格和换行
+                // 仅保留原始格式，不进行任何语法高亮处理
+                // 这样可以避免任何HTML标签被错误显示
                 code = code.trim();
                 
-                // 简单的Java语法高亮规则
-                // 关键字
-                const keywords = ['public', 'private', 'protected', 'class', 'static', 'void', 'main', 'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'default', 'break', 'continue', 'return', 'try', 'catch', 'finally', 'throw', 'throws', 'new', 'extends', 'implements', 'interface', 'package', 'import', 'true', 'false', 'null'];
-                keywords.forEach(keyword => {
-                    const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
-                    code = code.replace(regex, '<span class="keyword">$1</span>');
-                });
-                
-                // 字符串
-                code = code.replace(/"([^"]*)"/g, '<span class="string">"$1"</span>');
-                
-                // 单行注释
-                code = code.replace(/\/\/([^\n]*)/g, '<span class="comment">//$1</span>');
-                
-                // 类名（简单检测：首字母大写后跟字母数字）
-                code = code.replace(/\b([A-Z][a-zA-Z0-9]*)\b(?=\s*[\{=])/g, '<span class="class-name">$1</span>');
-                
-                // 方法名（简单检测：后面跟括号）
-                code = code.replace(/\b([a-zA-Z0-9_]+)\s*\(/g, '<span class="method-name">$1</span>(');
-                
-                // 数字
-                code = code.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
-                
-                // 更新代码块内容
-                block.innerHTML = code;
+                // 使用textContent而不是innerHTML，确保所有HTML标签都被当作普通文本处理
+                block.textContent = code;
             });
         }
         

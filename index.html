@@ -1335,19 +1335,32 @@ Double d = new Double(0.9);
             watermark.style.pointerEvents = 'none';
             watermark.style.userSelect = 'none';
             watermark.style.letterSpacing = '2px';
-            watermark.textContent = userId;
+              
+            // 设置水印内容，包含小号字体的"天浩同学"和用户ID
+            watermark.innerHTML = '<span style="font-size: 24px;">天浩同学</span> ' + userId;
             
-            // 添加多个水印层
-            for (let i = 0; i < 5; i++) {
+            
+             // 添加适量水印，避免过度叠加
+            const watermarkPositions = [
+                { top: 20, left: 20, rotation: -45 },
+                { top: 20, left: 60, rotation: -50 },
+                { top: 20, left: 90, rotation: -40 },
+                { top: 50, left: 10, rotation: -35 },
+                { top: 50, left: 50, rotation: -48 },
+                { top: 50, left: 80, rotation: -42 },
+                { top: 80, left: 30, rotation: -38 },
+                { top: 80, left: 70, rotation: -45 },
+                { top: 35, left: 40, rotation: -52 },
+                { top: 65, left: 65, rotation: -39 }
+            ];
+            
+            watermarkPositions.forEach(pos => {
                 const clone = watermark.cloneNode(true);
-                clone.style.top = (i * 20) + '%';
-                clone.style.left = (i * 15) + '%';
+                clone.style.top = pos.top + '%';
+                clone.style.left = pos.left + '%';
+                clone.style.transform = `translate(-50%, -50%) rotate(${pos.rotation}deg)`;
                 document.body.appendChild(clone);
-            }
-            
-            // 保存用户ID到本地存储
-            localStorage.setItem('java_exam_user', userId);
-        }
+            })
         
         // 防盗版功能：禁用右键菜单
         function disableRightClick() {

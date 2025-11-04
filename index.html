@@ -1563,31 +1563,60 @@ Double d = new Double(0.9);
                     const selectedOption = this.dataset.option;
                     const correctAnswer = questionCard.dataset.correctAnswer;
                     
-                    // 重置当前题目的所有选项样式
-                    const allOptions = questionCard.querySelectorAll('.options li');
-                    allOptions.forEach(opt => {
-                        opt.classList.remove('selected', 'correct', 'incorrect');
-                    });
+                    // 判断是否为多选题（通过标题中是否包含"多选"文字）
+                    const isMultipleChoice = questionCard.querySelector('h3').textContent.includes('多选');
                     
-                    // 添加选中样式
-                    this.classList.add('selected');
-                    
-                    // 保存用户答案
-                    userAnswers[questionId] = selectedOption;
-                    
-                    // 显示结果反馈
-                    const feedback = questionCard.querySelector('.result-feedback');
-                    if (feedback) {
-                        feedback.className = 'result-feedback';
+                    if (isMultipleChoice) {
+                        // 多选题逻辑
+                        // 切换选中状态
+                        this.classList.toggle('selected');
                         
-                        if (selectedOption === correctAnswer) {
-                            feedback.textContent = '✓ 回答正确！';
-                            feedback.classList.add('correct');
-                            this.classList.add('correct');
-                        } else {
-                            feedback.textContent = '✗ 回答错误，请再思考一下。';
-                            feedback.classList.add('incorrect');
-                            this.classList.add('incorrect');
+                        // 收集所有选中的选项
+                        const allOptions = questionCard.querySelectorAll('.options li');
+                        const selectedOptions = [];
+                        allOptions.forEach(opt => {
+                            if (opt.classList.contains('selected')) {
+                                selectedOptions.push(opt.dataset.option);
+                            }
+                        });
+                        
+                        // 保存用户答案（数组形式）
+                        userAnswers[questionId] = selectedOptions;
+                        
+                        // 显示结果反馈（多选题暂时不提供即时反馈，避免干扰思考）
+                        const feedback = questionCard.querySelector('.result-feedback');
+                        if (feedback) {
+                            feedback.className = 'result-feedback';
+                            feedback.style.display = 'none';
+                        }
+                    } else {
+                        // 单选题逻辑（保持原有行为）
+                        // 重置当前题目的所有选项样式
+                        const allOptions = questionCard.querySelectorAll('.options li');
+                        allOptions.forEach(opt => {
+                            opt.classList.remove('selected', 'correct', 'incorrect');
+                        });
+                        
+                        // 添加选中样式
+                        this.classList.add('selected');
+                        
+                        // 保存用户答案
+                        userAnswers[questionId] = selectedOption;
+                        
+                        // 显示结果反馈
+                        const feedback = questionCard.querySelector('.result-feedback');
+                        if (feedback) {
+                            feedback.className = 'result-feedback';
+                            
+                            if (selectedOption === correctAnswer) {
+                                feedback.textContent = '✓ 回答正确！';
+                                feedback.classList.add('correct');
+                                this.classList.add('correct');
+                            } else {
+                                feedback.textContent = '✗ 回答错误，请再思考一下。';
+                                feedback.classList.add('incorrect');
+                                this.classList.add('incorrect');
+                            }
                         }
                     }
                 });
@@ -1601,7 +1630,27 @@ Double d = new Double(0.9);
                 button.addEventListener('click', function() {
                     const answer = this.nextElementSibling; // 找到当前按钮的下一个元素（答案区域）
                     const questionCard = this.closest('.question-card');
-                    const correctAnswer = questionCard.dataset.correctAnswer;
+                    
+                    // 判断是否为多选题
+                    const isMultipleChoice = questionCard.querySelector('h3').textContent.includes('多选');
+                    
+                    // 对于多选题，获取完整的正确答案列表（可能包含多个选项）
+                    let correctAnswer = questionCard.dataset.correctAnswer;
+                    let correctAnswers = [];
+                    if (isMultipleChoice) {
+                        // 解析答案文本，可能是"答案：BC"或"答案：B，C"
+                        const answerElement = questionCard.querySelector('.answer h4');
+                        if (answerElement) {
+                            const answerText = answerElement.textContent;
+                            const correctAnswerMatch = answerText.match(/答案：([A-Z，,]+)/);
+                            if (correctAnswerMatch && correctAnswerMatch[1]) {
+                                // 分割多个答案（处理中文逗号和英文逗号）
+                                correctAnswers = correctAnswerMatch[1].split(/[，,]/).map(ans => ans.trim());
+                            }
+                        }
+                    } else {
+                        correctAnswers = [correctAnswer];
+                    }
                     
                     if (answer.style.display === 'block') {
                         answer.style.display = 'none';
@@ -1613,7 +1662,7 @@ Double d = new Double(0.9);
                             opt.classList.remove('correct', 'incorrect');
                             if (opt.classList.contains('selected')) {
                                 const userOption = opt.dataset.option;
-                                if (userOption === correctAnswer) {
+                                if (correctAnswers.includes(userOption)) {
                                     opt.classList.add('correct');
                                 } else {
                                     opt.classList.add('incorrect');
@@ -1627,10 +1676,10 @@ Double d = new Double(0.9);
                         // 显示正确答案的样式
                         const options = questionCard.querySelectorAll('.options li');
                         options.forEach(opt => {
-                            if (opt.dataset.option === correctAnswer) {
+                            if (correctAnswers.includes(opt.dataset.option)) {
                                 opt.classList.add('correct');
                             }
-                            if (opt.classList.contains('selected') && opt.dataset.option !== correctAnswer) {
+                            if (opt.classList.contains('selected') && !correctAnswers.includes(opt.dataset.option)) {
                                 opt.classList.add('incorrect');
                             }
                         });
@@ -1655,28 +1704,81 @@ Double d = new Double(0.9);
                 // 检查每个题目的答案
                 document.querySelectorAll('.question-card').forEach(question => {
                     const questionId = question.dataset.questionId;
-                    const correctAnswer = question.dataset.correctAnswer;
                     const userAnswer = userAnswers[questionId];
+                    
+                    // 判断是否为多选题
+                    const isMultipleChoice = question.querySelector('h3').textContent.includes('多选');
+                    
+                    // 获取正确答案（多选题需要特殊处理）
+                    let correctAnswers = [];
+                    if (isMultipleChoice) {
+                        // 解析多选题答案
+                        const answerElement = question.querySelector('.answer h4');
+                        if (answerElement) {
+                            const answerText = answerElement.textContent;
+                            const correctAnswerMatch = answerText.match(/答案：([A-Z，,]+)/);
+                            if (correctAnswerMatch && correctAnswerMatch[1]) {
+                                // 分割多个答案（处理中文逗号和英文逗号）
+                                correctAnswers = correctAnswerMatch[1].split(/[，,]/).map(ans => ans.trim());
+                            }
+                        }
+                    } else {
+                        // 单选题答案
+                        const correctAnswer = question.dataset.correctAnswer;
+                        correctAnswers = [correctAnswer];
+                    }
                     
                     if (userAnswer) {
                         totalAnswered++;
-                        if (userAnswer === correctAnswer) {
-                            correctCount++;
-                            // 标记正确的选项
-                            const correctOption = question.querySelector(`.options li[data-option="${correctAnswer}"]`);
-                            if (correctOption) {
-                                correctOption.classList.add('correct');
+                        let isCorrect = false;
+                        
+                        if (isMultipleChoice) {
+                            // 多选题答案比较：检查两个数组是否包含完全相同的元素（不考虑顺序）
+                            if (Array.isArray(userAnswer) && userAnswer.length === correctAnswers.length) {
+                                isCorrect = correctAnswers.every(ans => userAnswer.includes(ans)) && 
+                                          userAnswer.every(ans => correctAnswers.includes(ans));
                             }
                         } else {
-                            // 标记用户错误的选项和正确的选项
-                            const userOption = question.querySelector(`.options li[data-option="${userAnswer}"]`);
-                            if (userOption) {
-                                userOption.classList.add('incorrect');
+                            // 单选题答案比较
+                            isCorrect = userAnswer === correctAnswers[0];
+                        }
+                        
+                        if (isCorrect) {
+                            correctCount++;
+                            // 标记所有正确的选项
+                            correctAnswers.forEach(ans => {
+                                const correctOption = question.querySelector(`.options li[data-option="${ans}"]`);
+                                if (correctOption) {
+                                    correctOption.classList.add('correct');
+                                }
+                            });
+                        } else {
+                            // 标记用户选择的选项和正确的选项
+                            if (isMultipleChoice && Array.isArray(userAnswer)) {
+                                // 多选题：标记用户错误选择的选项
+                                userAnswer.forEach(ans => {
+                                    if (!correctAnswers.includes(ans)) {
+                                        const userOption = question.querySelector(`.options li[data-option="${ans}"]`);
+                                        if (userOption) {
+                                            userOption.classList.add('incorrect');
+                                        }
+                                    }
+                                });
+                            } else if (!isMultipleChoice) {
+                                // 单选题：标记用户错误的选项
+                                const userOption = question.querySelector(`.options li[data-option="${userAnswer}"]`);
+                                if (userOption) {
+                                    userOption.classList.add('incorrect');
+                                }
                             }
-                            const correctOption = question.querySelector(`.options li[data-option="${correctAnswer}"]`);
-                            if (correctOption) {
-                                correctOption.classList.add('correct');
-                            }
+                            
+                            // 标记所有正确的选项
+                            correctAnswers.forEach(ans => {
+                                const correctOption = question.querySelector(`.options li[data-option="${ans}"]`);
+                                if (correctOption) {
+                                    correctOption.classList.add('correct');
+                                }
+                            });
                         }
                         
                         // 显示答案

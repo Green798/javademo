@@ -1462,17 +1462,31 @@ Double d = new Double(0.9);
                 }
             }
             
-            // 防止断点调试
-            let lastTime = new Date();
+            // 防止断点调试，增加页面可见性检测避免窗口切换误报
+            let lastTime = performance.now();
+            let visibleCheck = 0;
             const checkInterval = setInterval(() => {
-                const now = new Date();
-                if (now - lastTime > 1000) {
-                    // 可能设置了断点
-                    alert('检测到断点调试，页面将被重置。');
-                    window.location.reload();
+                // 检查页面是否可见
+                if (document.hidden) {
+                    // 页面不可见时，重置计时器但不报错
+                    lastTime = performance.now();
+                    return;
+                }
+                
+                const now = performance.now();
+                // 增加阈值到3000ms，并需要连续两次检测才触发
+                if (now - lastTime > 3000) {
+                    visibleCheck++;
+                    if (visibleCheck > 1) {
+                        // 连续两次检测到延迟，可能确实有断点
+                        alert('检测到断点调试，页面将被重置。');
+                        window.location.reload();
+                    }
+                } else {
+                    visibleCheck = 0;
                 }
                 lastTime = now;
-            }, 500);
+            }, 800); // 增加间隔时间
         }
         
         // 记录访问信息

@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java工程师模拟题 - 可交互复习版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2c3e50;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        /* 题目卡片样式 */
+        .question-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .question-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        .question-card h3 span {
+            background-color: #3498db;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        .question-content {
+            color: #34495e;
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        /* 选项样式 */
+        .options {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        .options li {
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #34495e;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .options li:before {
+            content: "●";
+            color: #3498db;
+            margin-right: 8px;
+        }
+        .options li:hover {
+            background-color: #f0f7fc;
+            border-color: #3498db;
+        }
+        .options li.selected {
+            background-color: #f0f7fc;
+            border-color: #3498db;
+            font-weight: bold;
+        }
+        .options li.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .options li.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .options li.selected:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-color: #3498db;
+            border-radius: 50%;
+        }
+        /* 结果提示 */
+        .result-feedback {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: none;
+        }
+        .result-feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .result-feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        /* 代码块样式（题目中的程序代码） */
+        .code-block {
+            background-color: #1e1e1e;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            overflow-x: auto;
+            white-space: pre;
+            word-wrap: normal;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 代码语法高亮基础样式 */
+        .code-block .keyword {
+            color: #569cd6;
+        }
+        .code-block .string {
+            color: #ce9178;
+        }
+        .code-block .comment {
+            color: #6a9955;
+        }
+        .code-block .class-name {
+            color: #4ec9b0;
+        }
+        .code-block .method-name {
+            color: #dcdcaa;
+        }
+        .code-block .number {
+            color: #b5cea8;
+        }
+        
+        /* 滚动条样式 */
+        .code-block::-webkit-scrollbar {
+            height: 8px;
+        }
+        .code-block::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 4px;
+        }
+        .code-block::-webkit-scrollbar-thumb {
+            background: #4d4d4d;
+            border-radius: 4px;
+        }
+        .code-block::-webkit-scrollbar-thumb:hover {
+            background: #5d5d5d;
+        }
+        
+        /* 防盗版水印样式增强 */
+        #user-watermark {
+            pointer-events: none !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            filter: alpha(opacity=5);
+            -khtml-opacity: 0.05;
+            -moz-opacity: 0.05;
+            transition: none !important;
+        }
+        
+        /* 防止网页打印时移除水印 */
+        @media print {
+            #user-watermark {
+                display: block !important;
+                position: absolute !important;
+                opacity: 0.08 !important;
+                z-index: 9999 !important;
+            }
+        }
+        
+        /* 防止通过开发者工具轻易修改样式 */
+        body::before {
+            content: '';
+            display: none;
+        }
+        
+        /* 增强整体页面保护 */
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* 但允许在代码块中选择文本（为了学习） */
+        .code-block {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+        /* 按钮样式 */
+        .show-answer {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        .show-answer:hover {
+            background-color: #2980b9;
+        }
+        /* 答案区域样式 */
+        .answer {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 4px;
+            background-color: #e8f4fd;
+            display: none; /* 默认隐藏 */
+        }
+        .answer h4 {
+            color: #e74c3c;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .answer p {
+            color: #2c3e50;
+            font-size: 15px;
+        }
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #2c3e50;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .back-to-top.show {
+            opacity: 1;
+        }
+        /* 提交和结果区域 */
+        .submit-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .submit-button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        .submit-button:hover {
+            background-color: #218838;
+        }
+        .score-result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f4fd;
+            border-radius: 8px;
+            display: none;
+        }
+        .score-result.show {
+            display: block;
+        }
+        .score-result h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .score-result p {
+            font-size: 16px;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+        .score-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #3498db;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Java软件开发工程师模拟题</h1>
+        <p>点击「显示答案」查看解析，再次点击「隐藏答案」| 共51题（单选+多选+判断）</p>
+    </div>
+
+    <!-- 题目1：单选 -->
+    <div class="question-card" data-question-id="1" data-correct-answer="B">
+        <h3><span>1</span>以下哪个选项用八进制来表示十进制整数10？</h3>
+        <ul class="options">
+            <li data-option="A">A、0x10</li>
+            <li data-option="B">B、012</li>
+            <li data-option="C">C、010</li>
+            <li data-option="D">D、080</li>
+        </ul>
+        <div class="result-feedback"></div>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B</h4>
+            <p>解析：Java中八进制数以「0」开头，十进制10转八进制计算：8×1+2=10 → 八进制为012；A是十六进制（0x开头），C是八进制8（十进制），D中8不是八进制合法数字（八进制仅0-7）。</p>
+        </div>
+    </div>
+
+    <!-- 题目2：单选 -->
+    <div class="question-card">
+        <h3><span>2</span>在一个Java源文件中，import、class和package声明语句的先后顺序是什么？</h3>
+        <ul class="options">
+            <li>A、package，import，class</li>
+            <li>B、任意顺序</li>
+            <li>C、package，class，import</li>
+            <li>D、import，package，class</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A</h4>
+            <p>解析：Java源文件声明顺序规则：1. package（可选，若有必须在最前）；2. import（可选，在package之后、class之前）；3. class/interface（必须，在最后）。</p>
+        </div>
+    </div>
+
+    <!-- 题目3：单选 -->
+    <div class="question-card">
+        <h3><span>3</span>以下哪段代码会通过编译？</h3>
+        <ul class="options">
+            <li>A、float f=12;</li>
+            <li>B、char c="1";</li>
+            <li>C、byte b=197;</li>
+            <li>D、boolean f=null;</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A</h4>
+            <p>解析：A：int类型12可自动向上转型为float（小范围→大范围），编译通过；B：char需单引号（'1'），双引号是String，类型不匹配；C：byte取值范围-128~127，197超出范围；D：boolean仅允许true/false，不能赋值null。</p>
+        </div>
+    </div>
+
+    <!-- 题目4：单选 -->
+    <div class="question-card">
+        <h3><span>4</span>byte类型的取值范围是什么？</h3>
+        <ul class="options">
+            <li>A、-2^8 ~ 2^8</li>
+            <li>B、0 ~ 255</li>
+            <li>C、取决于Java虚拟机的实现</li>
+            <li>D、-128 ~ 127</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：Java中byte是8位有符号整数，取值范围计算公式：-2^(n-1) ~ 2^(n-1)-1（n为位数），即-128 ~ 127；A错误（2^8=256，范围应为-128~127），B是无符号byte范围（Java无无符号基本类型），C错误（基本类型范围固定，与JVM无关）。</p>
+        </div>
+    </div>
+
+    <!-- 题目5：单选 -->
+    <div class="question-card">
+        <h3><span>5</span>以下程序定义了一个Sample类，运行命令“java Sample One Two Three”，会出现什么情况？</h3>
+        <div class="code-block">
+public class Sample{ 
+  public static void main(String args[]){ 
+    System.out.println(args[2]) ;
+  }
+}
+        </div>
+        <ul class="options">
+            <li>A、打印“One”</li>
+            <li>B、打印“Two”</li>
+            <li>C、打印“Three”</li>
+            <li>D、抛出异常：java.lang.ArrayIndexOutOfBoundsException</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：main方法的args数组存储运行时传入的参数，下标从0开始：args[0] = "One"，args[1] = "Two"，args[2] = "Three"，因此打印args[2]即“Three”。</p>
+        </div>
+    </div>
+
+    <!-- 题目6：单选 -->
+    <div class="question-card">
+        <h3><span>6</span>假定在C:盘根目录下存在a.txt文件，以下程序代码能否通过编译，如果通过编译，运行时会出现什么情况？</h3>
+        <div class="code-block">
+FileInputStream fin=new FileInputStream("C:\\a.txt");
+System.out.println(fin instanceof InputStream);
+System.out.println(fin instanceof Reader);
+        </div>
+        <ul class="options">
+            <li>A、编译时出错</li>
+            <li>B、运行时出错</li>
+            <li>C、运行时打印“true”和“false”</li>
+            <li>D、运行时打印“true”和“true”</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A</h4>
+            <p>解析：FileInputStream和Reader均属于java.io包，使用时需导入（import java.io.*;），若未导入，编译时会提示“找不到符号”，因此编译出错；若导入后：FileInputStream是InputStream的子类（第一个判断true），与Reader是不同继承体系（字节流vs字符流，第二个判断false）。</p>
+        </div>
+    </div>
+
+    <!-- 题目7：单选 -->
+    <div class="question-card">
+        <h3><span>7</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+public class Sample{
+  private int var;
+  public static void main(String[] args) {
+    System.out.println("Value is: " + var);
+  } 
+}
+        </div>
+        <ul class="options">
+            <li>A、运行时打印“Value is: 0”</li>
+            <li>B、编译时出错：变量var可能没有被初始化</li>
+            <li>C、编译时出错：在main()方法中不允许直接引用非静态的变量var</li>
+            <li>D、运行时出错：变量var可能没有被初始化</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：main方法是静态（static）方法，静态方法属于类，而非对象，无法直接访问非静态成员变量（var是实例变量，需通过对象访问），编译时直接报错；若要访问，需创建Sample对象：new Sample().var。</p>
+        </div>
+    </div>
+
+    <!-- 题目8：单选 -->
+    <div class="question-card">
+        <h3><span>8</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+01: public class Sample{
+02:
+03:   private void test() {
+04: 
+05:     String aStr = "One";
+06:     String bStr = new String();
+07:     String cStr = new String("Three");
+08:     String dStr = aStr;
+09:     System.out.println(aStr + "," + bStr + "," + cStr + "," + dStr );
+10:   }
+11: 
+12:   public static void main(String[] args) {
+13:     new Sample().test();
+14:   } 
+15: }
+        </div>
+        <ul class="options">
+            <li>A、第5行编译时出错</li>
+            <li>B、运行时出错：变量dStr可能没有被初始化</li>
+            <li>C、运行时出错：第9行抛出java.lang.NullPointerException</li>
+            <li>D、运行时打印“One,,Three,One”</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：所有代码编译正常：aStr赋值为“One”；bStr是new String()（空字符串）；cStr赋值为“Three”；dStr引用aStr（值为“One”）；拼接后结果为“One,,Three,One”（bStr是空字符串，所以两个逗号间无内容）。</p>
+        </div>
+    </div>
+
+    <!-- 题目9：单选 -->
+    <div class="question-card">
+        <h3><span>9</span>运行以下程序代码，会打印什么结果？</h3>
+        <div class="code-block">
+public class Sample{
+  private void test() {
+    String aStr = " One ";
+    String bStr = aStr;
+    aStr.toUpperCase();
+    aStr.trim();
+    System.out.println("[" + aStr + "," + bStr + "]"+1+2);
+  }
+  public static void main(String[] args) {
+    new Sample().test();
+  } 
+}
+        </div>
+        <ul class="options">
+            <li>A、[ONE, One ]12</li>
+            <li>B、[ One , One ]3</li>
+            <li>C、[ONE,ONE]12</li>
+            <li>D、[ One , One ]12</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：1. String是不可变对象，toUpperCase()和trim()不会修改原字符串，需用变量接收结果（如aStr = aStr.trim()），因此aStr仍为“ One ”；2. bStr引用aStr，值相同；3. 字符串拼接优先级：“[...]”先拼接，再拼接1（转为字符串），最后拼接2，结果为“[ One , One ]12”（不是3，因为1和2是int，未先运算）。</p>
+        </div>
+    </div>
+
+    <!-- 题目10：单选 -->
+    <div class="question-card">
+        <h3><span>10</span>运行以下程序代码，会打印什么结果？</h3>
+        <div class="code-block">
+int a=1,b=1;
+b=++a;
+a=b++;
+System.out.println("a="+a+" b="+ b); 
+        </div>
+        <ul class="options">
+            <li>A、a=1 b=1</li>
+            <li>B、a=1 b=2</li>
+            <li>C、a=2 b=3</li>
+            <li>D、a=2 b=2</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：1. 初始a=1，b=1；2. b=++a：++a是先自增（a变为2），再赋值给b → b=2；3. a=b++：b++是先赋值（a=2），再自增（b变为3）；最终a=2，b=3。</p>
+        </div>
+    </div>
+
+    <!-- 题目11：单选 -->
+    <div class="question-card">
+        <h3><span>11</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+01: public class Sample{
+02:
+03:   int array[];
+04:
+05:   private void test() {
+06:     System.out.println("Value is: " + array[0]);
+07:   }
+08: 
+09:   public static void main(String[] args) {
+10:     new Sample().test();
+11:   }  
+12: }
+        </div>
+        <ul class="options">
+            <li>A、编译错误：变量array可能没有被初始化</li>
+            <li>B、运行时出错：变量array[0]可能没有被初始化</li>
+            <li>C、运行时出错：第6行抛出java.lang.NullPointerException</li>
+            <li>D、运行时打印“Value is: 0”</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：1. 数组array是实例变量，未初始化时默认值为null（引用类型默认null）；2. 编译通过（Java允许声明数组不初始化）；3. 运行时访问array[0]，实际是访问null的下标，抛出空指针异常（NullPointerException）。</p>
+        </div>
+    </div>
+
+    <!-- 题目12：单选 -->
+    <div class="question-card">
+        <h3><span>12</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+01: public class Sample{
+02:
+03:   String array[] = new String[3];
+04:
+05:   private void test() {
+06:     System.out.println("Value is: " + array[0]);
+07:   }
+08: 
+09:   public static void main(String[] args) {
+10:     new Sample().test();
+11:   }
+12: }
+        </div>
+        <ul class="options">
+            <li>A、编译时出错：变量array可能没有被初始化</li>
+            <li>B、运行时出错：变量array[0]可能没有被初始化</li>
+            <li>C、运行时出错：第6行抛出java.lang.NullPointerException</li>
+            <li>D、运行时打印“Value is: null”</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：1. array已初始化（new String[3]），创建长度为3的String数组；2. 数组元素是引用类型（String），未赋值时默认值为null；3. 访问array[0]即null，打印“Value is: null”，无异常。</p>
+        </div>
+    </div>
+
+    <!-- 题目13：单选（同题1，重复巩固） -->
+    <div class="question-card">
+        <h3><span>13</span>以下哪个选项用八进制来表示十进制整数10？</h3>
+        <ul class="options">
+            <li>A、0x10</li>
+            <li>B、012</li>
+            <li>C、010</li>
+            <li>D、080</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B</h4>
+            <p>解析：同题1，八进制以0开头，十进制10转八进制为012；A是十六进制，C是八进制8，D含非法数字8。</p>
+        </div>
+    </div>
+
+    <!-- 题目14：单选 -->
+    <div class="question-card">
+        <h3><span>14</span>数字“0x21”转换为十进制整数是多少？</h3>
+        <ul class="options">
+            <li>A、17</li>
+            <li>B、21</li>
+            <li>C、33</li>
+            <li>D、021</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：0x开头是十六进制，转换规则：每一位乘16的对应次方相加。0x21 = 2×16^1 + 1×16^0 = 32 + 1 = 33。</p>
+        </div>
+    </div>
+
+    <!-- 题目15：单选 -->
+    <div class="question-card">
+        <h3><span>15</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+public abstract class Sample{
+  private boolean f;
+  public static void main(String[] args) {
+    System.out.println(new Sample().f);
+  } 
+}
+        </div>
+        <ul class="options">
+            <li>A、运行时打印“false”</li>
+            <li>B、编译时出错：变量 f 有可能没有被初始化</li>
+            <li>C、运行时出错：抛出java.lang.NullPointerException</li>
+            <li>D、编译时出错：Sample类是抽象类，不允许被实例化</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：抽象类（abstract修饰）的核心特点是“不能被实例化”，new Sample()试图创建抽象类对象，编译时直接报错；f是boolean实例变量，默认值为false，但因实例化错误，无法执行到打印步骤。</p>
+        </div>
+    </div>
+
+    <!-- 题目16：单选 -->
+    <div class="question-card">
+        <h3><span>16</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+public class Sample{
+  private static final int var;
+  Sample(){var=1;}
+  public static void main(String[] args) {
+    System.out.println("Value is: " + var);
+  } 
+}
+        </div>
+        <ul class="options">
+            <li>A、编译时出错：在构造方法中不允许给static final类型的成员变量赋值</li>
+            <li>B、编译时出错：main()方法中无法访问private类型的变量var</li>
+            <li>C、运行时出错：变量var没有被初始化</li>
+            <li>D、运行时打印“Value is: 1”</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A</h4>
+            <p>解析：1. static final变量（静态常量）需满足：要么声明时赋值，要么在静态代码块中赋值（静态成员属于类，构造方法是实例创建时执行，晚于静态成员初始化）；2. 构造方法中给static final赋值，编译报错；3. var是private，但main是同类静态方法，可访问private静态变量（B错误）。</p>
+        </div>
+    </div>
+
+    <!-- 题目17：单选 -->
+    <div class="question-card">
+        <h3><span>17</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+public class Sample{
+  private int var;
+  private void test() {
+    int var=2;
+    System.out.println("Value is: " + this.var);
+  }
+  public static void main(String[] args) {
+    new Sample().test();
+  }
+}
+        </div>
+        <ul class="options">
+            <li>A、运行时打印“Value is: 0”</li>
+            <li>B、运行时出错：变量var有可能没有被初始化</li>
+            <li>C、编译时出错：变量var有可能没有被初始化</li>
+            <li>D、运行时打印“Value is: 2”</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A</h4>
+            <p>解析：1. 局部变量var（test方法内）遮蔽了实例变量var，但this.var明确引用实例变量；2. 实例变量var未赋值，默认值为0（int默认0）；3. 打印this.var即0，编译运行均正常。</p>
+        </div>
+    </div>
+
+    <!-- 题目18：单选 -->
+    <div class="question-card">
+        <h3><span>18</span>表达式“6 | 3”的值为多少？</h3>
+        <ul class="options">
+            <li>A、TRUE</li>
+            <li>B、false</li>
+            <li>C、9</li>
+            <li>D、7</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：|是位运算“或”，规则：对应位有1则为1。先转二进制：6→110，3→011；位或结果：111（二进制），即十进制7。</p>
+        </div>
+    </div>
+
+    <!-- 题目19：单选 -->
+    <div class="question-card">
+        <h3><span>19</span>学校里每个班级包括若干名学生。按照UML的理论，班级与学生之间是什么关系？</h3>
+        <ul class="options">
+            <li>A、依赖</li>
+            <li>B、关联</li>
+            <li>C、实现</li>
+            <li>D、泛化</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B</h4>
+            <p>解析：UML关系定义：A依赖（临时使用，如方法参数）；B关联（长期稳定的包含/聚合关系，如班级包含学生）；C实现（类实现接口）；D泛化（类继承父类/接口继承父接口）。</p>
+        </div>
+    </div>
+
+    <!-- 题目20：单选 -->
+    <div class="question-card">
+        <h3><span>20</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+public class Sample{
+  private void test() {
+    System.out.println(6 && 3); 
+  }
+  public static void main(String[] args) {
+    new Sample().test();
+  } 
+}
+        </div>
+        <ul class="options">
+            <li>A、运行时打印“true”</li>
+            <li>B、运行时打印“false”</li>
+            <li>C、编译时出错</li>
+            <li>D、运行时打印“9”</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：&&是逻辑“与”运算符，要求两边操作数必须是boolean类型（true/false），而6和3是int类型，类型不匹配，编译报错；若要做位运算，需用&（6&3= 110 & 011=010→2）。</p>
+        </div>
+    </div>
+
+    <!-- 题目21：单选 -->
+    <div class="question-card">
+        <h3><span>21</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+public class Sample{
+  private void test() {
+    System.out.println(6 >> 33); 
+  }
+  public static void main(String[] args) {
+    new Sample().test();
+  } 
+}
+        </div>
+        <ul class="options">
+            <li>A、6</li>
+            <li>B、1</li>
+            <li>C、3</li>
+            <li>D、编译时出错：操作符“>>”的右边的操作元不能大于32</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：1. >>是右移运算符，对于int类型（32位），右移位数n的实际有效位是n % 32（因为32位整数移32位相当于没移）；2. 33 % 32 =1，因此6 >> 33 等价于6 >>1；3. 6二进制110，右移1位为11（二进制），即十进制3。</p>
+        </div>
+    </div>
+
+    <!-- 题目22：单选 -->
+    <div class="question-card">
+        <h3><span>22</span>“System.out.println(Math.ceil(-2.1));”的打印结果是什么？</h3>
+        <ul class="options">
+            <li>A、-2</li>
+            <li>B、-2.0</li>
+            <li>C、-3</li>
+            <li>D、-3.0</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B</h4>
+            <p>解析：Math.ceil()是“向上取整”（取大于等于参数的最小整数），返回值类型是double：-2.1向上取整为-2.0（-2 > -2.1，且是最小的整数）；若为-2.9，ceil结果是-2.0。</p>
+        </div>
+    </div>
+
+    <!-- 题目23：单选 -->
+    <div class="question-card">
+        <h3><span>23</span>wait()、notify()和notifyAll()方法是在哪个类中定义的？</h3>
+        <ul class="options">
+            <li>A、Thread</li>
+            <li>B、Runnable</li>
+            <li>C、Object</li>
+            <li>D、ThreadLocal</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：wait()/notify()/notifyAll()是用于线程同步的方法，定义在Object类中（因为每个对象都有锁，这些方法与锁绑定）；Thread类中没有这些方法，需通过同步对象调用。</p>
+        </div>
+    </div>
+
+    <!-- 题目24：单选 -->
+    <div class="question-card">
+        <h3><span>24</span>以下程序代码能否通过编译，如果通过编译，运行“java Sample”时会出现什么情况？</h3>
+        <div class="code-block">
+public class Sample{
+  private void test() {
+    System.out.println("Result:" + 6 - 6);
+  }
+  public static void main(String[] args) {
+    new Sample().test();
+  } 
+}
+        </div>
+        <ul class="options">
+            <li>A、运行时打印“Result:0”</li>
+            <li>B、运行时打印“Result:66”</li>
+            <li>C、运行时出错：无法把int类型数据转换为字符串</li>
+            <li>D、编译时出错：操作符“-”的操作元的类型不匹配</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：1. 运算符优先级：+（字符串拼接）和-（减法）优先级相同，从左到右执行；2. 先执行“Result:” + 6 → 字符串“Result:6”；3. 再执行“Result:6” - 6 → 试图用字符串减int，类型不匹配，编译报错；若要先算减法，需加括号：“Result:” + (6-6)。</p>
+        </div>
+    </div>
+
+    <!-- 题目25：单选 -->
+    <div class="question-card">
+        <h3><span>25</span>以下代码能否通过编译，如果通过编译，运行时得到什么打印结果？</h3>
+        <div class="code-block">
+Object o = new String("abcd");
+String s = o;
+System.out.println(o);
+        </div>
+        <ul class="options">
+            <li>A、运行时打印“abcd”</li>
+            <li>B、运行时打印“java.lang.Object@de6ced”</li>
+            <li>C、运行时出错：抛出java.lang.ClassCastException</li>
+            <li>D、编译时出错：变量o不能直接赋值给变量s</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：D</h4>
+            <p>解析：1. o是Object类型（父类），s是String类型（子类）；2. Java中“父类引用赋值给子类变量”需强制类型转换（向下转型），直接赋值编译报错；3. 正确写法：String s = (String)o; 此时运行打印“abcd”（o实际是String对象，toString()返回内容）。</p>
+        </div>
+    </div>
+
+    <!-- 题目26：单选 -->
+    <div class="question-card">
+        <h3><span>26</span>以下代码能否通过编译，如果能通过编译，运行时得到什么打印结果？</h3>
+        <div class="code-block">
+01: int output=20; 
+02: boolean b1 = false;
+03: if((b1==true) && ((output+=10)==30)){ 
+04:   System.out.println("We are equal "+output); 
+05: }else{ 
+06:   System.out.println("Not equal! "+output); 
+07: } 
+        </div>
+        <ul class="options">
+            <li>A、编译时出错：第3行的逻辑表达式语法不正确</li>
+            <li>B、运行时打印“We are equal 30”</li>
+            <li>C、运行时打印“Not equal! 20”</li>
+            <li>D、以上选项都不正确</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：1. &&是“短路与”：左边为false时，右边不执行；2. b1==true为false，因此右边(output+=10)不执行，output仍为20；3. 进入else分支，打印“Not equal! 20”，编译正常。</p>
+        </div>
+    </div>
+
+    <!-- 题目27：单选 -->
+    <div class="question-card">
+        <h3><span>27</span>在一个Frame容器中加入了一个Button，当Frame的大小发生变化，Button的大小保持不变。Frame采用了什么布局管理器？</h3>
+        <ul class="options">
+            <li>A、FlowLayout</li>
+            <li>B、GridLayout</li>
+            <li>C、BorderLayout</li>
+            <li>D、CardLayout</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A</h4>
+            <p>解析：各布局管理器特点：A FlowLayout（流式布局）：组件大小固定，容器缩放时组件位置变但大小不变；B GridLayout（网格布局）：组件随网格均分容器空间，大小变化；C BorderLayout（边界布局）：组件随容器方向（如NORTH/SOUTH）缩放；D CardLayout（卡片布局）：一次显示一个组件，组件大小随容器变化。</p>
+        </div>
+    </div>
+
+    <!-- 题目28：单选 -->
+    <div class="question-card">
+        <h3><span>28</span>封装的主要特点是什么？</h3>
+        <ul class="options">
+            <li>A、对象的所有方法都是public类型的</li>
+            <li>B、对象的所有方法都不会抛出异常</li>
+            <li>C、当对象的内部实现细节发生变化，只要接口不变，就不会影响使用者的程序代码</li>
+            <li>D、当对象的接口发生变化，只要内部实现细节不变，就不会影响使用者的程序代码</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：封装的核心是“隐藏内部实现，暴露公共接口”：A错误（封装常将成员变量设为private，通过public方法访问）；B错误（方法是否抛异常与封装无关）；C正确（内部变、接口不变，使用者无需修改）；D错误（接口变，使用者必须适配新接口）。</p>
+        </div>
+    </div>
+
+    <!-- 题目29：单选 -->
+    <div class="question-card">
+        <h3><span>29</span>以下哪个集合不允许存放重复的Java对象？</h3>
+        <ul class="options">
+            <li>A、Map</li>
+            <li>B、List</li>
+            <li>C、Set</li>
+            <li>D、Collection</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：C</h4>
+            <p>解析：集合特性：A Map（键值对，键唯一、值可重复）；B List（有序、可重复，如ArrayList）；C Set（无序、不可重复，如HashSet，基于equals()和hashCode()判断重复）；D Collection是List、Set的父接口，不直接使用，特性由子类决定。</p>
+        </div>
+    </div>
+
+    <!-- 题目30：单选 -->
+    <div class="question-card">
+        <h3><span>30</span>关于非静态内部类，以下哪个说法正确？</h3>
+        <ul class="options">
+            <li>A、它必须实现一个接口</li>
+            <li>B、它可以访问外部类的private类型的实例变量</li>
+            <li>C、只有它的外部类才能创建它的实例</li>
+            <li>D、如果它位于一个方法中，必须声明为final类型</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B</h4>
+            <p>解析：非静态内部类特点：A错误（无需强制实现接口）；B正确（非静态内部类持有外部类实例引用，可访问外部类所有访问权限的成员，包括private）；C错误（其他类也可创建：外部类实例.new 内部类()）；D错误（方法内的内部类（局部内部类）无需强制final，JDK8+支持“effectively final”）。</p>
+        </div>
+    </div>
+
+    <!-- 题目31：单选 -->
+    <div class="question-card">
+        <h3><span>31</span>String类是在哪个包中定义的？</h3>
+        <ul class="options">
+            <li>A、java.util</li>
+            <li>B、java.lang</li>
+            <li>C、java.awt</li>
+            <li>D、java.io</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B</h4>
+            <p>解析：java.lang包是Java核心包，包含常用类（String、Object、Thread等），无需import可直接使用；A是工具类包（如ArrayList、HashMap）；C是图形界面包；D是IO流包。</p>
+        </div>
+    </div>
+
+    <!-- 题目32：多选 -->
+    <div class="question-card">
+        <h3><span>32</span>以下哪些是合法的Java关键字？（多选）</h3>
+        <ul class="options">
+            <li>A、NULL</li>
+            <li>B、switch</li>
+            <li>C、instanceof</li>
+            <li>D、String</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：BC</h4>
+            <p>解析：Java关键字是小写英文：A NULL是大写，不是关键字（null才是关键字，表空值）；B switch是分支关键字（switch-case）；C instanceof是关键字（判断对象是否为某类实例）；D String是类名，不是关键字。</p>
+        </div>
+    </div>
+
+    <!-- 题目33：多选 -->
+    <div class="question-card">
+        <h3><span>33</span>以下哪些是合法的Java标识符？（多选）</h3>
+        <ul class="options">
+            <li>A、FALSE</li>
+            <li>B、Integer</li>
+            <li>C、_1_Dog</li>
+            <li>D、throw</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：AC</h4>
+            <p>解析：标识符规则：1. 由字母、数字、_、$组成；2. 不能以数字开头；3. 不能是关键字；4. 区分大小写。A FALSE（不是关键字，false才是，合法）；B Integer（是类名，可作为标识符，但不推荐，易混淆）；C _1_Dog（以_开头，含数字和字母，合法）；D throw（是关键字，非法）。</p>
+        </div>
+    </div>
+
+    <!-- 题目34：多选 -->
+    <div class="question-card">
+        <h3><span>34</span>以下哪些选项正确声明了Java程序的main()入口方法？（多选）</h3>
+        <ul class="options">
+            <li>A、public static void main(String[] args)</li>
+            <li>B、public static void main(String args[])</li>
+            <li>C、static public void main(String[] var)</li>
+            <li>D、static void public main(String a)</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：ABC</h4>
+            <p>解析：main方法标准格式：public static void main(String[] 参数名)。要求：1. 访问修饰符public（必须）；2. static（必须）；3. 返回值void（必须）；4. 参数是String数组（[]位置可在参数名前/后，参数名任意）。A正确；B正确（String args[]等价于String[] args）；C正确（static和public顺序可换，参数名var合法）；D错误（访问修饰符顺序错误：void不能在public前，且参数是String而非String数组）。</p>
+        </div>
+    </div>
+
+    <!-- 题目35：多选 -->
+    <div class="question-card">
+        <h3><span>35</span>Java接口中的方法可以使用哪些修饰符？（多选）</h3>
+        <ul class="options">
+            <li>A、static</li>
+            <li>B、abstract</li>
+            <li>C、protected</li>
+            <li>D、public</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：BD</h4>
+            <p>解析：接口方法规则（JDK8+）：1. 抽象方法：默认public abstract（可省略，但不能用其他修饰符）；2. 静态方法（static）：必须public（可省略），但题目问“可以使用哪些修饰符”，抽象方法不能用static（A错误）；3. 不能用protected（C错误，接口方法无protected权限）；B（abstract）和D（public）正确。</p>
+        </div>
+    </div>
+
+    <!-- 题目36：多选 -->
+    <div class="question-card">
+        <h3><span>36</span>以下哪些方法在Object类中定义？（多选）</h3>
+        <ul class="options">
+            <li>A、toString()</li>
+            <li>B、equals(Object o)</li>
+            <li>C、main(String[] args)</li>
+            <li>D、println()</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：AB</h4>
+            <p>解析：Object类是所有类的父类，核心方法包括toString()、equals()、hashCode()、wait()等；A、B正确；C main()是程序入口方法，定义在自定义类中（如Sample），不在Object；D println()是PrintStream类（System.out是PrintStream对象）的方法，不在Object。</p>
+        </div>
+    </div>
+
+    <!-- 题目37：多选 -->
+    <div class="question-card">
+        <h3><span>37</span>关于Java接口，以下哪些说法正确？（多选）</h3>
+        <ul class="options">
+            <li>A、接口中的方法都是public的</li>
+            <li>B、一个接口可以继承多个父接口</li>
+            <li>C、接口中的变量都是public的</li>
+            <li>D、接口中的变量可以采用private、protected、默认或public访问控制级别</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：ABC</h4>
+            <p>解析：接口规则：A正确（接口方法默认public，无论抽象还是静态）；B正确（Java接口支持多继承，如interface A extends B,C{}）；C正确（接口变量默认public static final，必须public）；D错误（接口变量只能是public，不能用private/protected）。</p>
+        </div>
+    </div>
+
+    <!-- 题目38：多选 -->
+    <div class="question-card">
+        <h3><span>38</span>对于以下程序代码，哪些是合法的表达式，并且取值为true？（多选）</h3>
+        <div class="code-block">
+Float f = new Float(0.9F);
+Float g = new Float(0.9F);
+Double d = new Double(0.9);
+        </div>
+        <ul class="options">
+            <li>A、(f==g)</li>
+            <li>B、(f.equals(new Float(0.9F))</li>
+            <li>C、(f.equals(d))</li>
+            <li>D、(f.equals(g))</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：BD</h4>
+            <p>解析：1. ==对于引用类型：比较地址（f和g是new的两个不同对象，地址不同，A错误）；2. equals()：Float的equals()先判断类型是否相同，再比较值：B（f是Float，new Float(0.9F)也是Float，值相同，true）；C（f是Float，d是Double，类型不同，false）；D（f和g都是Float，值相同，true）。</p>
+        </div>
+    </div>
+
+    <!-- 题目39：多选 -->
+    <div class="question-card">
+        <h3><span>39</span>关于JavaDoc文档，以下哪些说法正确？（多选）</h3>
+        <ul class="options">
+            <li>A、JavaDoc文档是指开发人员用Word软件编写的DOC文档</li>
+            <li>B、JDK的javadoc命令能生成HTML格式的JavaDoc文档</li>
+            <li>C、JavaDoc文档是指Java源文件中的所有注释</li>
+            <li>D、JavaDoc文档的内容来源于Java源文件中符合特定语法的注释</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：BD</h4>
+            <p>解析：JavaDoc是生成API文档的工具：A错误（不是Word文档，是HTML）；B正确（javadoc命令解析源文件注释，生成HTML文档）；C错误（仅“/** ... */”格式的注释才会被javadoc识别，//或/* ... */不会）；D正确（内容来自特定语法注释，如@param、@return等标签）。</p>
+        </div>
+    </div>
+
+    <!-- 题目40：多选 -->
+    <div class="question-card">
+        <h3><span>40</span>构造方法不能被哪些修饰符修饰？（多选）</h3>
+        <ul class="options">
+            <li>A、final</li>
+            <li>B、static</li>
+            <li>C、public</li>
+            <li>D、abstract</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：ABD</h4>
+            <p>解析：构造方法修饰符规则：1. 可以用public、protected、默认、private（C可以，排除）；2. 不能用final（A：final修饰方法不能被重写，构造方法不能被重写，无需final）；3. 不能用static（B：static属于类，构造方法是实例创建时调用，属于对象）；4. 不能用abstract（D：abstract方法需子类实现，构造方法不能被实现）。</p>
+        </div>
+    </div>
+
+    <!-- 题目41：多选 -->
+    <div class="question-card">
+        <h3><span>41</span>以下哪些选项正确定义了二维的int类型的数组？（多选）</h3>
+        <ul class="options">
+            <li>A、int a[10][10] = new int[][];</li>
+            <li>B、int a[][] = new int [10][10];</li>
+            <li>C、int []a[] = new int [10][10];</li>
+            <li>D、int [][]a = new int[10][10];</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：BCD</h4>
+            <p>解析：Java二维数组定义规则：1. 声明时不能指定长度（A错误，a[10][10]非法）；2. []位置灵活：int[][] a、int[] a[]、int a[][] 均等价；3. 初始化时需指定至少一维长度（new int[10][10]正确）。B、C、D均正确。</p>
+        </div>
+    </div>
+
+    <!-- 题目42：判断 -->
+    <div class="question-card">
+        <h3><span>42</span>抽象方法不允许被static修饰。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A（正确）</h4>
+            <p>解析：抽象方法（abstract）需子类实现，属于实例；static方法属于类，无需实例即可调用，无法被实现。因此抽象方法不能用static修饰，编译报错。</p>
+        </div>
+    </div>
+
+    <!-- 题目43：判断 -->
+    <div class="question-card">
+        <h3><span>43</span>抽象类不允许被final修饰。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A（正确）</h4>
+            <p>解析：抽象类（abstract）的核心目的是被继承（子类实现抽象方法）；final类不能被继承，两者矛盾，因此抽象类不能用final修饰，编译报错。</p>
+        </div>
+    </div>
+
+    <!-- 题目44：判断 -->
+    <div class="question-card">
+        <h3><span>44</span>抽象类不允许有静态方法。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B（错误）</h4>
+            <p>解析：抽象类可以有静态方法（static），静态方法属于类，无需实例即可调用，与抽象类是否被继承无关。例如：abstract class A { public static void test() {} } 编译正常。</p>
+        </div>
+    </div>
+
+    <!-- 题目45：判断 -->
+    <div class="question-card">
+        <h3><span>45</span>抽象类不允许有final方法。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B（错误）</h4>
+            <p>解析：抽象类可以有final方法，final方法不能被重写，但抽象类的核心是“有抽象方法需子类实现”，非抽象方法可设为final。例如：abstract class A { public final void test() {} public abstract void test2(); } 编译正常。</p>
+        </div>
+    </div>
+
+    <!-- 题目46：判断 -->
+    <div class="question-card">
+        <h3><span>46</span>final类不允许有静态方法。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B（错误）</h4>
+            <p>解析：final类不能被继承，但可以有静态方法（static），静态方法属于类，与是否继承无关。例如：final class A { public static void test() {} } 编译正常，可通过A.test()调用。</p>
+        </div>
+    </div>
+
+    <!-- 题目47：判断 -->
+    <div class="question-card">
+        <h3><span>47</span>final类不允许有抽象方法。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A（正确）</h4>
+            <p>解析：抽象方法（abstract）需子类实现，而final类不能被继承，无法有子类实现抽象方法，两者矛盾，因此final类不能有抽象方法，编译报错。</p>
+        </div>
+    </div>
+
+    <!-- 题目48：判断 -->
+    <div class="question-card">
+        <h3><span>48</span>所有的Java类都是Object类的直接或间接子类。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A（正确）</h4>
+            <p>解析：Java是单继承体系，Object类是顶层父类，所有类（包括自定义类、系统类如String）要么直接继承Object（class A {} 等价于 class A extends Object {}），要么间接继承（class B extends A {}，A继承Object）。</p>
+        </div>
+    </div>
+
+    <!-- 题目49：判断 -->
+    <div class="question-card">
+        <h3><span>49</span>Java类只允许有一个直接的父类。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A（正确）</h4>
+            <p>解析：Java不支持类的多继承（避免菱形问题），一个类只能有一个直接父类，但可以通过接口实现多继承的效果（类实现多个接口）。</p>
+        </div>
+    </div>
+
+    <!-- 题目50：判断 -->
+    <div class="question-card">
+        <h3><span>50</span>Java类允许实现多个接口。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：A（正确）</h4>
+            <p>解析：Java类支持多实现，用逗号分隔多个接口，例如：class A implements B, C {}（B和C是接口），这是Java弥补单继承的重要特性。</p>
+        </div>
+    </div>
+
+    <!-- 题目51：判断 -->
+    <div class="question-card">
+        <h3><span>51</span>一个Java接口可以实现另一个Java接口。（判断：正确/错误）</h3>
+        <ul class="options">
+            <li>A、正确</li>
+            <li>B、错误</li>
+        </ul>
+        <button class="show-answer">显示答案</button>
+        <div class="answer">
+            <h4>答案：B（错误）</h4>
+            <p>解析：接口之间的关系是“继承”（extends），不是“实现”（implements）；一个接口可以继承多个父接口（如interface A extends B, C {}），而“实现”是类对接口的操作（class A implements B {}）。</p>
+        </div>
+    </div>
+
+    <!-- 提交和评分区域 -->
+    <div class="submit-section">
+        <button class="submit-button">提交答卷并评分</button>
+        <div class="score-result">
+            <h2>评分结果</h2>
+            <div class="score-value" id="final-score">0</div>
+            <p id="correct-count">正确题数：0</p>
+            <p id="total-questions">总题数：51</p>
+            <p id="scoring-info">每题2分，未作答计0分</p>
+        </div>
+    </div>
+
+    <!-- 回到顶部按钮 -->
+    <div class="back-to-top">↑</div>
+
+    <script>
+        // 防盗版功能：用户信息水印
+        function addUserWatermark() {
+            // 获取用户信息（可以从URL参数或生成随机ID）
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('user') || 'user_' + Math.random().toString(36).substr(2, 9);
+            
+            // 创建水印元素
+            const watermark = document.createElement('div');
+            watermark.id = 'user-watermark';
+            watermark.style.position = 'fixed';
+            watermark.style.top = '50%';
+            watermark.style.left = '50%';
+            watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+            watermark.style.fontSize = '48px';
+            watermark.style.color = 'rgba(0, 0, 0, 0.05)';
+            watermark.style.zIndex = '-1';
+            watermark.style.pointerEvents = 'none';
+            watermark.style.userSelect = 'none';
+            watermark.style.letterSpacing = '2px';
+            watermark.textContent = userId;
+            
+            // 添加多个水印层
+            for (let i = 0; i < 5; i++) {
+                const clone = watermark.cloneNode(true);
+                clone.style.top = (i * 20) + '%';
+                clone.style.left = (i * 15) + '%';
+                document.body.appendChild(clone);
+            }
+            
+            // 保存用户ID到本地存储
+            localStorage.setItem('java_exam_user', userId);
+        }
+        
+        // 防盗版功能：禁用右键菜单
+        function disableRightClick() {
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                alert('右键菜单已禁用，保护知识产权。');
+            });
+        }
+        
+        // 防盗版功能：禁用复制和选择
+        function disableCopy() {
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                alert('复制功能已禁用，保护知识产权。');
+            });
+            
+            // 禁止选择文本
+            document.body.style.userSelect = 'none';
+            
+            // 禁止拖拽
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+        }
+        
+        // 防盗版功能：浏览器指纹检测
+        function getBrowserFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 绘制一些内容以产生不同的指纹
+            ctx.font = '14px Arial';
+            ctx.fillText('Browser fingerprint', 10, 20);
+            
+            // 收集浏览器信息
+            const fingerprint = {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                screen: `${screen.width}x${screen.height}`,
+                colorDepth: screen.colorDepth,
+                canvas: canvas.toDataURL(),
+                plugins: Array.from(navigator.plugins).map(p => p.name).join(',')
+            };
+            
+            // 简单哈希
+            return Object.values(fingerprint).join('').split('').reduce((acc, char) => {
+                acc = ((acc << 5) - acc) + char.charCodeAt(0);
+                return acc & acc;
+            }, 0).toString(16);
+        }
+        
+        // 字符串哈希函数
+        String.prototype.hashCode = function() {
+            let hash = 0;
+            if (this.length === 0) return hash;
+            for (let i = 0; i < this.length; i++) {
+                const char = this.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // 转换为32位整数
+            }
+            return hash;
+        };
+        
+        // 混淆代码：简单的字符串加密和解密
+        function encryptString(str, key) {
+            let result = '';
+            for (let i = 0; i < str.length; i++) {
+                result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return btoa(result);
+        }
+        
+        function decryptString(encrypted, key) {
+            let str = atob(encrypted);
+            let result = '';
+            for (let i = 0; i < str.length; i++) {
+                result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return result;
+        }
+        
+        // 反调试保护
+        function antiDebugging() {
+            // 检测控制台是否打开
+            const start = new Date().getTime();
+            console.log('Debug check');
+            console.clear();
+            const end = new Date().getTime();
+            
+            if (end - start > 100) {
+                // 控制台可能被打开
+                if (confirm('检测到可能的调试行为，继续访问将记录您的信息。确定继续吗？')) {
+                    logAccess('debug_attempt');
+                } else {
+                    window.location.href = 'about:blank';
+                }
+            }
+            
+            // 防止断点调试
+            let lastTime = new Date();
+            const checkInterval = setInterval(() => {
+                const now = new Date();
+                if (now - lastTime > 1000) {
+                    // 可能设置了断点
+                    alert('检测到断点调试，页面将被重置。');
+                    window.location.reload();
+                }
+                lastTime = now;
+            }, 500);
+        }
+        
+        // 记录访问信息
+        function logAccess(action) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('user') || localStorage.getItem('java_exam_user') || 'unknown';
+            const fingerprint = localStorage.getItem('java_exam_fingerprint') || 'unknown';
+            const timestamp = new Date().toISOString();
+            
+            // 这里可以发送到服务器，现在只是存储在本地
+            const logEntry = {
+                userId,
+                fingerprint,
+                action,
+                timestamp,
+                url: window.location.href
+            };
+            
+            // 简单混淆日志
+            const logKey = 'java_exam_log_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem(logKey, encryptString(JSON.stringify(logEntry), 'java_exam_key'));
+        }
+        
+        // 检测页面是否在iframe中（防止嵌套盗用）
+        function detectIframe() {
+            if (window.self !== window.top) {
+                document.body.innerHTML = '<div style="text-align:center; padding:50px; font-family:Arial;"><h2>此内容不允许在框架中显示</h2><p>请直接访问原始页面</p></div>';
+                logAccess('iframe_attempt');
+            }
+        }
+        
+        // 存储用户答案
+        const userAnswers = {};
+        
+        // 初始化所有题目，添加正确答案数据属性
+        function initQuestions() {
+            const questions = document.querySelectorAll('.question-card');
+            questions.forEach((question, index) => {
+                if (!question.dataset.questionId) {
+                    question.dataset.questionId = index + 1;
+                }
+                // 从答案区域提取正确答案
+                if (!question.dataset.correctAnswer) {
+                    const answerElement = question.querySelector('.answer h4');
+                    if (answerElement) {
+                        const answerText = answerElement.textContent;
+                        const correctAnswerMatch = answerText.match(/答案：([A-Z，,]+)/);
+                        if (correctAnswerMatch && correctAnswerMatch[1]) {
+                            // 提取A、B、C、D等答案标识
+                            const correctAnswer = correctAnswerMatch[1].split(/[，,]/)[0].trim();
+                            question.dataset.correctAnswer = correctAnswer;
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 初始化选项点击事件
+        function initOptionClicks() {
+            const options = document.querySelectorAll('.options li');
+            options.forEach(option => {
+                // 添加数据属性
+                if (!option.dataset.option) {
+                    const optionText = option.textContent.trim();
+                    const optionLetter = optionText.charAt(0);
+                    if (['A', 'B', 'C', 'D'].includes(optionLetter)) {
+                        option.dataset.option = optionLetter;
+                    }
+                }
+                
+                option.addEventListener('click', function() {
+                    const questionCard = this.closest('.question-card');
+                    const questionId = questionCard.dataset.questionId;
+                    const selectedOption = this.dataset.option;
+                    const correctAnswer = questionCard.dataset.correctAnswer;
+                    
+                    // 重置当前题目的所有选项样式
+                    const allOptions = questionCard.querySelectorAll('.options li');
+                    allOptions.forEach(opt => {
+                        opt.classList.remove('selected', 'correct', 'incorrect');
+                    });
+                    
+                    // 添加选中样式
+                    this.classList.add('selected');
+                    
+                    // 保存用户答案
+                    userAnswers[questionId] = selectedOption;
+                    
+                    // 显示结果反馈
+                    const feedback = questionCard.querySelector('.result-feedback');
+                    if (feedback) {
+                        feedback.className = 'result-feedback';
+                        
+                        if (selectedOption === correctAnswer) {
+                            feedback.textContent = '✓ 回答正确！';
+                            feedback.classList.add('correct');
+                            this.classList.add('correct');
+                        } else {
+                            feedback.textContent = '✗ 回答错误，请再思考一下。';
+                            feedback.classList.add('incorrect');
+                            this.classList.add('incorrect');
+                        }
+                    }
+                });
+            });
+        }
+        
+        // 答案显示/隐藏交互
+        function initAnswerButtons() {
+            const buttons = document.querySelectorAll('.show-answer');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const answer = this.nextElementSibling; // 找到当前按钮的下一个元素（答案区域）
+                    const questionCard = this.closest('.question-card');
+                    const correctAnswer = questionCard.dataset.correctAnswer;
+                    
+                    if (answer.style.display === 'block') {
+                        answer.style.display = 'none';
+                        this.textContent = '显示答案';
+                        
+                        // 清除选项的正确/错误样式（保留选中状态）
+                        const options = questionCard.querySelectorAll('.options li');
+                        options.forEach(opt => {
+                            opt.classList.remove('correct', 'incorrect');
+                            if (opt.classList.contains('selected')) {
+                                const userOption = opt.dataset.option;
+                                if (userOption === correctAnswer) {
+                                    opt.classList.add('correct');
+                                } else {
+                                    opt.classList.add('incorrect');
+                                }
+                            }
+                        });
+                    } else {
+                        answer.style.display = 'block';
+                        this.textContent = '隐藏答案';
+                        
+                        // 显示正确答案的样式
+                        const options = questionCard.querySelectorAll('.options li');
+                        options.forEach(opt => {
+                            if (opt.dataset.option === correctAnswer) {
+                                opt.classList.add('correct');
+                            }
+                            if (opt.classList.contains('selected') && opt.dataset.option !== correctAnswer) {
+                                opt.classList.add('incorrect');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+        
+        // 初始化提交按钮功能
+        function initSubmitButton() {
+            const submitButton = document.querySelector('.submit-button');
+            const scoreResult = document.querySelector('.score-result');
+            const finalScoreElement = document.getElementById('final-score');
+            const correctCountElement = document.getElementById('correct-count');
+            const totalQuestionsElement = document.getElementById('total-questions');
+            
+            submitButton.addEventListener('click', function() {
+                let correctCount = 0;
+                let totalAnswered = 0;
+                const totalQuestions = document.querySelectorAll('.question-card').length;
+                
+                // 检查每个题目的答案
+                document.querySelectorAll('.question-card').forEach(question => {
+                    const questionId = question.dataset.questionId;
+                    const correctAnswer = question.dataset.correctAnswer;
+                    const userAnswer = userAnswers[questionId];
+                    
+                    if (userAnswer) {
+                        totalAnswered++;
+                        if (userAnswer === correctAnswer) {
+                            correctCount++;
+                            // 标记正确的选项
+                            const correctOption = question.querySelector(`.options li[data-option="${correctAnswer}"]`);
+                            if (correctOption) {
+                                correctOption.classList.add('correct');
+                            }
+                        } else {
+                            // 标记用户错误的选项和正确的选项
+                            const userOption = question.querySelector(`.options li[data-option="${userAnswer}"]`);
+                            if (userOption) {
+                                userOption.classList.add('incorrect');
+                            }
+                            const correctOption = question.querySelector(`.options li[data-option="${correctAnswer}"]`);
+                            if (correctOption) {
+                                correctOption.classList.add('correct');
+                            }
+                        }
+                        
+                        // 显示答案
+                        const answer = question.querySelector('.answer');
+                        const answerButton = question.querySelector('.show-answer');
+                        if (answer && answer.style.display !== 'block') {
+                            answer.style.display = 'block';
+                            if (answerButton) {
+                                answerButton.textContent = '隐藏答案';
+                            }
+                        }
+                    }
+                });
+                
+                // 计算分数（每题2分）
+                const score = correctCount * 2;
+                
+                // 更新显示结果
+                finalScoreElement.textContent = score;
+                correctCountElement.textContent = `正确题数：${correctCount}`;
+                totalQuestionsElement.textContent = `总题数：${totalQuestions}`;
+                scoreResult.classList.add('show');
+                
+                // 滚动到结果区域
+                scoreResult.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+        
+        // 回到顶部功能
+        function initBackToTop() {
+            const backToTop = document.querySelector('.back-to-top');
+            window.addEventListener('scroll', function() {
+                // 滚动超过500px时显示回到顶部按钮
+                if (window.scrollY > 500) {
+                    backToTop.classList.add('show');
+                } else {
+                    backToTop.classList.remove('show');
+                }
+            });
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth' // 平滑滚动
+                });
+            });
+        }
+        
+        // 代码语法高亮功能
+        function initCodeHighlighting() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => {
+                let code = block.textContent;
+                
+                // 保留原始空格和换行
+                code = code.trim();
+                
+                // 简单的Java语法高亮规则
+                // 关键字
+                const keywords = ['public', 'private', 'protected', 'class', 'static', 'void', 'main', 'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'default', 'break', 'continue', 'return', 'try', 'catch', 'finally', 'throw', 'throws', 'new', 'extends', 'implements', 'interface', 'package', 'import', 'true', 'false', 'null'];
+                keywords.forEach(keyword => {
+                    const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
+                    code = code.replace(regex, '<span class="keyword">$1</span>');
+                });
+                
+                // 字符串
+                code = code.replace(/"([^"]*)"/g, '<span class="string">"$1"</span>');
+                
+                // 单行注释
+                code = code.replace(/\/\/([^\n]*)/g, '<span class="comment">//$1</span>');
+                
+                // 类名（简单检测：首字母大写后跟字母数字）
+                code = code.replace(/\b([A-Z][a-zA-Z0-9]*)\b(?=\s*[\{=])/g, '<span class="class-name">$1</span>');
+                
+                // 方法名（简单检测：后面跟括号）
+                code = code.replace(/\b([a-zA-Z0-9_]+)\s*\(/g, '<span class="method-name">$1</span>(');
+                
+                // 数字
+                code = code.replace(/\b(\d+)\b/g, '<span class="number">$1</span>');
+                
+                // 更新代码块内容
+                block.innerHTML = code;
+            });
+        }
+        
+        // 初始化所有功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 启动反调试保护
+            antiDebugging();
+            
+            // 检测是否在iframe中
+            detectIframe();
+            
+            // 首先启动防盗版功能
+            addUserWatermark();
+            disableRightClick();
+            disableCopy();
+            
+            // 记录访问信息
+            const fingerprint = getBrowserFingerprint();
+            localStorage.setItem('java_exam_fingerprint', fingerprint);
+            logAccess('page_load');
+            
+            // 然后初始化常规功能
+            initQuestions();
+            initOptionClicks();
+            initAnswerButtons();
+            initSubmitButton();
+            initBackToTop();
+            initCodeHighlighting();
+            
+            // 添加页面可见性变化检测
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    // 页面变得可见时再次检查
+                    antiDebugging();
+                }
+            });
+            
+            // 添加页面离开检测
+            window.addEventListener('beforeunload', function() {
+                logAccess('page_unload');
+            });
+        });
+    </script>
+</body>
+</html>
